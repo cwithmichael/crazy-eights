@@ -10,11 +10,13 @@
 
 `go run cmd/crazy_eights/main.go`
 
+## Rules used for Implementation
+[Rules of Crazy 8s](https://www.ducksters.com/games/crazy_eights_rules.php)
+
 ## How to Run Tests
 
 `go test ./...`
 
 ## TODO
-1. Handle an 8 being played (8s are wild)
-2. Handle the deck being exhausted
-3. Improve test coverage
+1. Handle the deck being exhausted
+2. Improve test coverage
