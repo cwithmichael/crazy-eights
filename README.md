@@ -2,8 +2,15 @@
 
 ## Requirements
 
-Go Version 1.12
+`Go (Minimum Version: 1.12)`
 
+## How To Start Game
+
+`go run cmd/crazy_eights/main.go`
+
+## How to Run Tests
+
+`go test ./...`
 
 ## TODO
 1. Handle an 8 being played (8s are wild)
