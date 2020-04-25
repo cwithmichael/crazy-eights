@@ -10,7 +10,7 @@
 
 `go run cmd/crazy_eights/main.go`
 
-## Rules used for Implementation
+## Rules Used for Implementation
 [Rules of Crazy 8s](https://www.ducksters.com/games/crazy_eights_rules.php)
 
 ## How to Run Tests
