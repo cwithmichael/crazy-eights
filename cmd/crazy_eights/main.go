@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/cwithmichael/crazy_eights/internal/card"
 	"github.com/cwithmichael/crazy_eights/pkg/game"
 	"github.com/cwithmichael/crazy_eights/pkg/player"
 )
@@ -22,18 +23,18 @@ func showHand(p *player.Player) {
 }
 
 func promptUser(r *bufio.Reader) (int, error) {
-	fmt.Print("Enter # of card you want to play: ")
-	cardIndex, err := getDesiredCardIndex(r)
+	fmt.Printf("\nEnter # of card you want to play: ")
+	cardIndex, err := getDesiredIndex(r)
 	return cardIndex, err
 }
 
-func getDesiredCardIndex(r *bufio.Reader) (int, error) {
+func getDesiredIndex(r *bufio.Reader) (int, error) {
 	input, _, err := r.ReadLine()
-	cardIndex, err := strconv.Atoi(string(input))
+	index, err := strconv.Atoi(string(input))
 	if err != nil {
 		return -1, err
 	}
-	return cardIndex - 1, nil
+	return index - 1, nil
 }
 
 func checkIfWinner(p *player.Player) bool {
@@ -54,8 +55,9 @@ func checkIfWinner(p *player.Player) bool {
 func main() {
 	r := bufio.NewReader(os.Stdin)
 	fmt.Println("Crazy 8s")
-	crazy := game.NewGame(2)
-	crazy.DealCards(7)
+	numberOfPlayers, cardsPerPlayer := 2, 7
+	crazy := game.NewGame(numberOfPlayers)
+	crazy.DealCards(cardsPerPlayer)
 	player1, player2 := 0, 1
 
 	for {
@@ -86,10 +88,21 @@ func main() {
 			validPlay = crazy.ValidPlay(player1, cardIndex)
 		}
 		playedCard, err := crazy.PlayCard(player1, cardIndex)
+		fmt.Println(playedCard)
 		if err != nil {
 			fmt.Errorf("something went terribly wrong: %v", err)
 		}
 		fmt.Printf("You played %v\n", playedCard)
+		if playedCard.Rank() == card.Eight {
+			fmt.Println("1: Spades 2: Hearts 3: Diamonds 4: Clubs")
+			fmt.Print("Enter # of Suit you want to play: ")
+			suit, err := getDesiredIndex(r)
+			for err != nil {
+				fmt.Println("Invalid choice")
+				suit, err = getDesiredIndex(r)
+			}
+			crazy.HandleEight(suit)
+		}
 		if checkIfWinner(crazy.Players[player1]) {
 			break
 		}

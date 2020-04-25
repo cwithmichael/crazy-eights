@@ -37,6 +37,8 @@ func (c8 *CrazyEights) DealCards(cardDist int) {
 	if idx + 1 < len(c8.DrawPile) {
 		c8.DrawPile = append(c8.DrawPile[:idx], c8.DrawPile[idx+1:]...)
 	}
+	c8.addToDiscardPile(c8.DrawPile[len(c8.DrawPile)-1])
+	c8.DrawPile = c8.DrawPile[:len(c8.DrawPile)-1]
 }
 
 // DrawCard draws a Card from the top of the DrawPile
@@ -72,6 +74,19 @@ func (c8 *CrazyEights) addToDiscardPile(discardedCard card.Card) {
 	c8.DiscardPile = append(c8.DiscardPile, discardedCard)
 }
 
+// HandleEight changes the suit of the 8 to match the player's 
+// preferred choice of suit
+func (c8 *CrazyEights) HandleEight(desiredSuit int) error {
+	if desiredSuit < 0 || desiredSuit > 4 {
+		return errors.New("Unknown Suit")
+	}
+	if len(c8.DiscardPile) > 0 {
+		c8.DiscardPile = c8.DiscardPile[:len(c8.DiscardPile)-1]
+	}
+	c8.DiscardPile = append(c8.DiscardPile, card.NewCard(card.Suit(desiredSuit), card.Eight))
+	return nil
+}
+
 // TopOfDiscardPile shows the top card of the DiscardPile
 func (c8 *CrazyEights) TopOfDiscardPile() (card.Card, error) {
 	if len(c8.DiscardPile) > 0 {
@@ -94,7 +109,7 @@ func (c8 *CrazyEights) TopOfDrawPile() (card.Card, error) {
 func (c8 *CrazyEights) EligibleTurn(playerID int) bool {
 	topCard, _ := c8.TopOfDiscardPile()
 	for _, v := range c8.Players[playerID].Hand() {
-		if v.Rank() == card.Rank(8) ||
+		if v.Rank() == card.Eight ||
 			v.Suit() == topCard.Suit() ||
 			v.Rank() == topCard.Rank() {
 			return true
@@ -108,7 +123,7 @@ func (c8 *CrazyEights) EligibleTurn(playerID int) bool {
 // cardIndex is the index of the played Card from the Player's hand
 func (c8 *CrazyEights) ValidPlay(playerID int, cardIndex int) bool {
 	topCard, _ := c8.TopOfDiscardPile()
-	return c8.Players[playerID].Hand()[cardIndex].Rank() == card.Rank(8) ||
+	return c8.Players[playerID].Hand()[cardIndex].Rank() == card.Eight ||
 	c8.Players[playerID].Hand()[cardIndex].Rank() == topCard.Rank() ||
 	c8.Players[playerID].Hand()[cardIndex].Suit() == topCard.Suit()
 }

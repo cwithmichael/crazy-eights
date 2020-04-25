@@ -32,7 +32,7 @@ func (deck StandardDeck) String() string {
 // ShuffleCards shuffles the StandardDeck and returns a
 // new slice of the shuffled cards (Does not modify the original deck)
 func (deck StandardDeck) ShuffleCards() []card.Card {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UTC().UnixNano())
 	shuffledCards := make([]card.Card, len(deck.cards))
 	copy(shuffledCards, deck.cards)
 	rand.Shuffle(len(deck.cards), func(i, j int) {
