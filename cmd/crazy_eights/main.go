@@ -3,56 +3,18 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/cwithmichael/crazy_eights/internal/card"
 	"github.com/cwithmichael/crazy_eights/pkg/game"
 	"github.com/cwithmichael/crazy_eights/pkg/player"
 )
 
-func showHand(p *player.Player) {
-	fmt.Printf("\nCurrent hand: \n")
-	for k, v := range p.Hand() {
-		if k >= 3 && k%3 == 0 {
-			fmt.Println()
-		}
-		fmt.Printf("(%d %v) ", k+1, v)
-	}
-	fmt.Println()
-}
-
-func promptUser(r *bufio.Reader) (int, error) {
-	fmt.Printf("\nEnter # of card you want to play: ")
-	cardIndex, err := getDesiredIndex(r)
-	return cardIndex, err
-}
-
-func getDesiredIndex(r *bufio.Reader) (int, error) {
-	input, _, err := r.ReadLine()
-	index, err := strconv.Atoi(string(input))
-	if err != nil {
-		return -1, err
-	}
-	return index - 1, nil
-}
-
-func checkIfWinner(p *player.Player) bool {
-	if len(p.Hand()) == 0 {
-		switch p.ID() {
-		case 0:
-			fmt.Println("You won!!!!!")
-		case 1:
-			fmt.Println("The CPU doesn't have any cards left.")
-			fmt.Println("You Lost :(")
-
-		}
-		return true
-	}
-	return false
-}
-
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	r := bufio.NewReader(os.Stdin)
 	fmt.Println("Crazy 8s")
 	numberOfPlayers, cardsPerPlayer := 2, 7
@@ -127,6 +89,11 @@ func main() {
 					fmt.Errorf("something went terribly wrong: %v", err)
 				}
 				fmt.Printf("CPU played %v\n", playedCard)
+				if playedCard.Rank() == card.Eight {
+					newSuit := rand.Intn(4)
+					crazy.HandleEight(newSuit)
+					fmt.Printf("CPU switched the suit to %v\n", card.Suit(newSuit))
+				}
 				break
 			}
 		}
@@ -135,4 +102,45 @@ func main() {
 		}
 
 	}
+}
+
+func showHand(p *player.Player) {
+	fmt.Printf("\nCurrent hand: \n")
+	for k, v := range p.Hand() {
+		if k >= 3 && k%3 == 0 {
+			fmt.Println()
+		}
+		fmt.Printf("(%d %v) ", k+1, v)
+	}
+	fmt.Println()
+}
+
+func promptUser(r *bufio.Reader) (int, error) {
+	fmt.Printf("\nEnter # of card you want to play: ")
+	cardIndex, err := getDesiredIndex(r)
+	return cardIndex, err
+}
+
+func getDesiredIndex(r *bufio.Reader) (int, error) {
+	input, _, err := r.ReadLine()
+	index, err := strconv.Atoi(string(input))
+	if err != nil {
+		return -1, err
+	}
+	return index - 1, nil
+}
+
+func checkIfWinner(p *player.Player) bool {
+	if len(p.Hand()) == 0 {
+		switch p.ID() {
+		case 0:
+			fmt.Println("You won!!!!!")
+		case 1:
+			fmt.Println("The CPU doesn't have any cards left.")
+			fmt.Println("You Lost :(")
+
+		}
+		return true
+	}
+	return false
 }
