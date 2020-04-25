@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/cwithmichael/crazy-eights.svg?branch=master)](https://travis-ci.org/cwithmichael/crazy-eights)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cwithmichael/crazy-eights)](https://goreportcard.com/report/github.com/cwithmichael/crazy-eights)
 
 # Crazy 8s
 
