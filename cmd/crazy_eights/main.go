@@ -29,6 +29,7 @@ func main() {
 		// If she does, then this function does nothing
 		// If she doesn't, then this function will force the player
 		// to draw from the draw pile until they have a playable card
+		// TODO: refactor this function to take out card drawing responsibility
 		checkForPlayableCard(crazy, player1)
 
 		// Present the user with the top of the pile and their hand
