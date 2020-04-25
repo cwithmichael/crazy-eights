@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+
 	"github.com/cwithmichael/crazy_eights/internal/card"
 	"github.com/cwithmichael/crazy_eights/internal/deck"
 	"github.com/cwithmichael/crazy_eights/pkg/player"
@@ -121,9 +122,13 @@ func (c8 *CrazyEights) EligibleTurn(playerID int) bool {
 // ValidPlay checks to see if the Card played is a valid option
 // playerID is the ID of the Player playing the Card
 // cardIndex is the index of the played Card from the Player's hand
-func (c8 *CrazyEights) ValidPlay(playerID int, cardIndex int) bool {
+func (c8 *CrazyEights) ValidPlay(playerID int, cardIndex int) (bool, error) {
+	playersHand := c8.Players[playerID].Hand()
+	if cardIndex < 0 || cardIndex > len(playersHand) {
+		return false, errors.New("Invalid card index")
+	}
 	topCard, _ := c8.TopOfDiscardPile()
-	return c8.Players[playerID].Hand()[cardIndex].Rank() == card.Eight ||
-		c8.Players[playerID].Hand()[cardIndex].Rank() == topCard.Rank() ||
-		c8.Players[playerID].Hand()[cardIndex].Suit() == topCard.Suit()
+	return playersHand[cardIndex].Rank() == card.Eight ||
+		playersHand[cardIndex].Rank() == topCard.Rank() ||
+		playersHand[cardIndex].Suit() == topCard.Suit(), nil
 }

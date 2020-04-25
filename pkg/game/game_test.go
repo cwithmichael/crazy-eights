@@ -116,38 +116,6 @@ func TestCrazyEights_EligibleTurn(t *testing.T) {
 	}
 }
 
-func TestCrazyEights_ValidPlay(t *testing.T) {
-	type fields struct {
-		Players     []*player.Player
-		DrawPile    []card.Card
-		DiscardPile []card.Card
-	}
-	type args struct {
-		playerID  int
-		cardIndex int
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c8 := &CrazyEights{
-				Players:     tt.fields.Players,
-				DrawPile:    tt.fields.DrawPile,
-				DiscardPile: tt.fields.DiscardPile,
-			}
-			if got := c8.ValidPlay(tt.args.playerID, tt.args.cardIndex); got != tt.want {
-				t.Errorf("CrazyEights.ValidPlay() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestCrazyEights_PlayCard(t *testing.T) {
 	type fields struct {
 		Players     []*player.Player
@@ -181,6 +149,44 @@ func TestCrazyEights_PlayCard(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CrazyEights.PlayCard() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCrazyEights_ValidPlay(t *testing.T) {
+	type fields struct {
+		Players     []*player.Player
+		DrawPile    []card.Card
+		DiscardPile []card.Card
+	}
+	type args struct {
+		playerID  int
+		cardIndex int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c8 := &CrazyEights{
+				Players:     tt.fields.Players,
+				DrawPile:    tt.fields.DrawPile,
+				DiscardPile: tt.fields.DiscardPile,
+			}
+			got, err := c8.ValidPlay(tt.args.playerID, tt.args.cardIndex)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CrazyEights.ValidPlay() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("CrazyEights.ValidPlay() = %v, want %v", got, tt.want)
 			}
 		})
 	}

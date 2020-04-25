@@ -22,21 +22,35 @@ func main() {
 	crazy.DealCards(cardsPerPlayer)
 	player1, player2 := 0, 1
 
+	var playedCard card.Card
+	var err error
 	for {
 		// Player 1's turn
 		realPlayerTurn(crazy, player1)
-		// Player 1 chooses a card
-		cardIndex, _ := promptUser(r)
-		// Check if card played was valid
-		playedCard := checkCard(crazy, r, player1, cardIndex)
+
+		for {
+			// Player 1 chooses a card
+			cardIndex, _ := promptUser(r)
+			// Check if card played was valid
+			playedCard, err = checkCard(crazy, r, player1, cardIndex)
+			if err == nil {
+				break
+			}
+			fmt.Println("Invalid card # - Please try again")
+		}
 		// Check if card played was an 8
 		if playedCard.Rank() == card.Eight {
 			fmt.Println("1: Spades 2: Hearts 3: Diamonds 4: Clubs")
 			fmt.Print("Enter # of Suit you want to play: ")
 			suit, err := getDesiredIndex(r)
-			for err != nil {
-				fmt.Println("Invalid choice")
-				suit, err = getDesiredIndex(r)
+			for {
+				if err != nil || suit < 1 || suit > 4 {
+					fmt.Println("Invalid choice - Please try again")
+					fmt.Print("Enter # of Suit you want to play: ")
+					suit, err = getDesiredIndex(r)
+				} else {
+					break
+				}
 			}
 			crazy.HandleEight(suit)
 		}
@@ -49,8 +63,9 @@ func main() {
 		// CPU Turn
 		cpuTurn(crazy, player2)
 		// CPU plays the first valid card
-		for i := 0; i < len(crazy.Players[player2].Hand()); i++ {
-			if crazy.ValidPlay(player2, i) {
+		for i := range crazy.Players[player2].Hand() {
+			validPlay, _ := crazy.ValidPlay(player2, i)
+			if validPlay {
 				playedCard, err := crazy.PlayCard(player2, i)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "something went terribly wrong: %v\n", err)
@@ -106,14 +121,20 @@ func cpuTurn(crazy *game.CrazyEights, playerID int) {
 }
 
 // checkCard checks to see if the card played is a valid play
-func checkCard(crazy *game.CrazyEights, r *bufio.Reader, playerID, cardIndex int) card.Card {
-	validPlay := crazy.ValidPlay(playerID, cardIndex)
+func checkCard(crazy *game.CrazyEights, r *bufio.Reader, playerID, cardIndex int) (card.Card, error) {
+	validPlay, err := crazy.ValidPlay(playerID, cardIndex)
+	if err != nil {
+		return card.Card{}, err
+	}
 	for validPlay == false {
 		showHand(crazy.Players[playerID])
 		topCard, _ := crazy.TopOfDiscardPile()
 		fmt.Println("Top of pile", topCard)
 		cardIndex, _ = promptUser(r)
-		validPlay = crazy.ValidPlay(playerID, cardIndex)
+		validPlay, err = crazy.ValidPlay(playerID, cardIndex)
+		if err != nil {
+			return card.Card{}, err
+		}
 	}
 	playedCard, err := crazy.PlayCard(playerID, cardIndex)
 	if err != nil {
@@ -121,7 +142,7 @@ func checkCard(crazy *game.CrazyEights, r *bufio.Reader, playerID, cardIndex int
 		os.Exit(1)
 	}
 	fmt.Printf("You played %v\n", playedCard)
-	return playedCard
+	return playedCard, nil
 
 }
 
