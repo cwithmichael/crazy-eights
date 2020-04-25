@@ -1,16 +1,16 @@
 package game
 
 import (
+	"errors"
 	"github.com/cwithmichael/crazy_eights/internal/card"
 	"github.com/cwithmichael/crazy_eights/internal/deck"
 	"github.com/cwithmichael/crazy_eights/pkg/player"
-	"errors"
 )
 
 // CrazyEights represents a game of Crazy 8s
 type CrazyEights struct {
-	Players []*player.Player
-	DrawPile []card.Card
+	Players     []*player.Player
+	DrawPile    []card.Card
 	DiscardPile []card.Card
 }
 
@@ -31,10 +31,10 @@ func NewGame(numberOfPlayers int) *CrazyEights {
 // cardDist is the number of Cards to distribute to each Player
 func (c8 *CrazyEights) DealCards(cardDist int) {
 	for i := 0; i < len(c8.Players); i++ {
-		c8.Players[i].AddToHand(c8.DrawPile[cardDist*i:cardDist*(i+1)]...)
+		c8.Players[i].AddToHand(c8.DrawPile[cardDist*i : cardDist*(i+1)]...)
 	}
-	idx := cardDist*len(c8.Players)
-	if idx + 1 < len(c8.DrawPile) {
+	idx := cardDist * len(c8.Players)
+	if idx+1 < len(c8.DrawPile) {
 		c8.DrawPile = append(c8.DrawPile[:idx], c8.DrawPile[idx+1:]...)
 	}
 	c8.addToDiscardPile(c8.DrawPile[len(c8.DrawPile)-1])
@@ -74,7 +74,7 @@ func (c8 *CrazyEights) addToDiscardPile(discardedCard card.Card) {
 	c8.DiscardPile = append(c8.DiscardPile, discardedCard)
 }
 
-// HandleEight changes the suit of the 8 to match the player's 
+// HandleEight changes the suit of the 8 to match the player's
 // preferred choice of suit
 func (c8 *CrazyEights) HandleEight(desiredSuit int) error {
 	if desiredSuit < 0 || desiredSuit > 4 {
@@ -124,6 +124,6 @@ func (c8 *CrazyEights) EligibleTurn(playerID int) bool {
 func (c8 *CrazyEights) ValidPlay(playerID int, cardIndex int) bool {
 	topCard, _ := c8.TopOfDiscardPile()
 	return c8.Players[playerID].Hand()[cardIndex].Rank() == card.Eight ||
-	c8.Players[playerID].Hand()[cardIndex].Rank() == topCard.Rank() ||
-	c8.Players[playerID].Hand()[cardIndex].Suit() == topCard.Suit()
+		c8.Players[playerID].Hand()[cardIndex].Rank() == topCard.Rank() ||
+		c8.Players[playerID].Hand()[cardIndex].Suit() == topCard.Suit()
 }

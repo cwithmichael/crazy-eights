@@ -23,39 +23,12 @@ func main() {
 	player1, player2 := 0, 1
 
 	for {
-		// Player 1 Turn
-		eligibleTurn := crazy.EligibleTurn(player1)
-		for eligibleTurn == false {
-			fmt.Println("Drawing a card because you don't have any playable cards")
-			_, err := crazy.DrawCard(player1)
-			//TODO: Handle draw deck being empty
-			if err != nil {
-				fmt.Println("The draw deck is exhuasted")
-				os.Exit(0)
-			}
-			eligibleTurn = crazy.EligibleTurn(player1)
-		}
-		topCard, _ := crazy.TopOfDiscardPile()
-		fmt.Printf("\nTop of pile %v\n", topCard)
-		showHand(crazy.Players[player1])
+		// Player 1's turn
+		realPlayerTurn(crazy, player1)
+		// Player 1 chooses a card
 		cardIndex, _ := promptUser(r)
-
 		// Check if card played was valid
-		validPlay := crazy.ValidPlay(player1, cardIndex)
-		for validPlay == false {
-			showHand(crazy.Players[player1])
-			topCard, _ = crazy.TopOfDiscardPile()
-			fmt.Println("Top of pile", topCard)
-			cardIndex, _ = promptUser(r)
-			validPlay = crazy.ValidPlay(player1, cardIndex)
-		}
-		playedCard, err := crazy.PlayCard(player1, cardIndex)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "something went terribly wrong: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Printf("You played %v\n", playedCard)
-
+		playedCard := checkCard(crazy, r, player1, cardIndex)
 		// Check if card played was an 8
 		if playedCard.Rank() == card.Eight {
 			fmt.Println("1: Spades 2: Hearts 3: Diamonds 4: Clubs")
@@ -68,23 +41,13 @@ func main() {
 			crazy.HandleEight(suit)
 		}
 
-		// Check to see if player1's hand is empty
+		// Check to see if Player 1's hand is empty
 		if checkIfWinner(crazy.Players[player1]) {
 			break
 		}
 
 		// CPU Turn
-		eligibleTurn = crazy.EligibleTurn(player2)
-		for eligibleTurn == false {
-			fmt.Println("CPU is drawing a card")
-			_, err := crazy.DrawCard(player2)
-			//TODO: Handle draw deck being empty
-			if err != nil {
-				fmt.Println("The draw deck is exhuasted")
-				os.Exit(0)
-			}
-			eligibleTurn = crazy.EligibleTurn(player2)
-		}
+		cpuTurn(crazy, player2)
 		// CPU plays the first valid card
 		for i := 0; i < len(crazy.Players[player2].Hand()); i++ {
 			if crazy.ValidPlay(player2, i) {
@@ -110,6 +73,58 @@ func main() {
 	}
 }
 
+// realPlayerTurn makes sure a player has an eligible card to play
+func realPlayerTurn(crazy *game.CrazyEights, playerID int) {
+	eligibleTurn := crazy.EligibleTurn(playerID)
+	for eligibleTurn == false {
+		fmt.Println("Drawing a card because you don't have any playable cards")
+		_, err := crazy.DrawCard(playerID)
+		//TODO: Handle draw deck being empty
+		if err != nil {
+			fmt.Println("The draw deck is exhausted")
+			os.Exit(0)
+		}
+		eligibleTurn = crazy.EligibleTurn(playerID)
+	}
+	topCard, _ := crazy.TopOfDiscardPile()
+	fmt.Printf("\nTop of pile %v\n", topCard)
+	showHand(crazy.Players[playerID])
+}
+
+func cpuTurn(crazy *game.CrazyEights, playerID int) {
+	eligibleTurn := crazy.EligibleTurn(playerID)
+	for eligibleTurn == false {
+		fmt.Println("CPU is drawing a card")
+		_, err := crazy.DrawCard(playerID)
+		//TODO: Handle draw deck being empty
+		if err != nil {
+			fmt.Println("The draw deck is exhausted")
+			os.Exit(0)
+		}
+		eligibleTurn = crazy.EligibleTurn(playerID)
+	}
+}
+
+// checkCard checks to see if the card played is a valid play
+func checkCard(crazy *game.CrazyEights, r *bufio.Reader, playerID, cardIndex int) card.Card {
+	validPlay := crazy.ValidPlay(playerID, cardIndex)
+	for validPlay == false {
+		showHand(crazy.Players[playerID])
+		topCard, _ := crazy.TopOfDiscardPile()
+		fmt.Println("Top of pile", topCard)
+		cardIndex, _ = promptUser(r)
+		validPlay = crazy.ValidPlay(playerID, cardIndex)
+	}
+	playedCard, err := crazy.PlayCard(playerID, cardIndex)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "something went terribly wrong: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("You played %v\n", playedCard)
+	return playedCard
+
+}
+
 func showHand(p *player.Player) {
 	fmt.Printf("\nCurrent hand: \n")
 	for k, v := range p.Hand() {
@@ -129,6 +144,9 @@ func promptUser(r *bufio.Reader) (int, error) {
 
 func getDesiredIndex(r *bufio.Reader) (int, error) {
 	input, _, err := r.ReadLine()
+	if err != nil {
+		return -1, err
+	}
 	index, err := strconv.Atoi(string(input))
 	if err != nil {
 		return -1, err
