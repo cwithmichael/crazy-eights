@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cwithmichael/crazy-eights.svg?branch=master)](https://travis-ci.org/cwithmichael/crazy-eights)
+
 # Crazy 8s
 
 ## Requirements
