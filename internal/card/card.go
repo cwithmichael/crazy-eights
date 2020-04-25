@@ -8,6 +8,7 @@ type Suit int
 // Rank represents the rank of a standard card
 type Rank int
 
+// Suits mapped to ints
 const (
 	Spades Suit = iota
 	Hearts
@@ -15,6 +16,7 @@ const (
 	Clubs
 )
 
+// Ranks mapped to ints
 const (
 	Ace Rank = iota
 	Two

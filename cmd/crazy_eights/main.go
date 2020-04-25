@@ -51,7 +51,8 @@ func main() {
 		}
 		playedCard, err := crazy.PlayCard(player1, cardIndex)
 		if err != nil {
-			fmt.Errorf("something went terribly wrong: %v", err)
+			fmt.Fprintf(os.Stderr, "something went terribly wrong: %v\n", err)
+			os.Exit(1)
 		}
 		fmt.Printf("You played %v\n", playedCard)
 
@@ -89,7 +90,8 @@ func main() {
 			if crazy.ValidPlay(player2, i) {
 				playedCard, err := crazy.PlayCard(player2, i)
 				if err != nil {
-					fmt.Errorf("something went terribly wrong: %v", err)
+					fmt.Fprintf(os.Stderr, "something went terribly wrong: %v\n", err)
+					os.Exit(1)
 				}
 				fmt.Printf("CPU played %v\n", playedCard)
 				if playedCard.Rank() == card.Eight {
