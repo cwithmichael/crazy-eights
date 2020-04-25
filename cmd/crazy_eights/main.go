@@ -25,8 +25,16 @@ func main() {
 	var playedCard card.Card
 	var err error
 	for {
-		// Player 1's turn
-		realPlayerTurn(crazy, player1)
+		// Checks to see if Player 1 has an eligible card in her hand
+		// If she does, then this function does nothing
+		// If she doesn't, then this function will force the player
+		// to draw from the draw pile until they have a playable card
+		checkForPlayableCard(crazy, player1)
+
+		// Present the user with the top of the pile and their hand
+		topCard, _ := crazy.TopOfDiscardPile()
+		fmt.Printf("\nTop of pile %v\n", topCard)
+		showHand(crazy.Players[player1])
 
 		for {
 			// Player 1 chooses a card
@@ -41,12 +49,12 @@ func main() {
 		// Check if card played was an 8
 		if playedCard.Rank() == card.Eight {
 			fmt.Println("1: Spades 2: Hearts 3: Diamonds 4: Clubs")
-			fmt.Print("Enter # of Suit you want to play: ")
+			fmt.Print("Enter # of Suit you want to switch to: ")
 			suit, err := getDesiredIndex(r)
 			for {
 				if err != nil || suit < 1 || suit > 4 {
 					fmt.Println("Invalid choice - Please try again")
-					fmt.Print("Enter # of Suit you want to play: ")
+					fmt.Print("Enter # of Suit you want to switch to: ")
 					suit, err = getDesiredIndex(r)
 				} else {
 					break
@@ -62,7 +70,7 @@ func main() {
 
 		// CPU Turn
 		cpuTurn(crazy, player2)
-		// CPU plays the first valid card
+		// CPU plays the first valid card it finds in its hand
 		for i := range crazy.Players[player2].Hand() {
 			validPlay, _ := crazy.ValidPlay(player2, i)
 			if validPlay {
@@ -72,6 +80,7 @@ func main() {
 					os.Exit(1)
 				}
 				fmt.Printf("CPU played %v\n", playedCard)
+				// CPU switches to a random suit
 				if playedCard.Rank() == card.Eight {
 					newSuit := rand.Intn(4)
 					crazy.HandleEight(newSuit)
@@ -88,8 +97,8 @@ func main() {
 	}
 }
 
-// realPlayerTurn makes sure a player has an eligible card to play
-func realPlayerTurn(crazy *game.CrazyEights, playerID int) {
+// checkForPlayableCard makes sure a player has an eligible card to play
+func checkForPlayableCard(crazy *game.CrazyEights, playerID int) {
 	eligibleTurn := crazy.EligibleTurn(playerID)
 	for eligibleTurn == false {
 		fmt.Println("Drawing a card because you don't have any playable cards")
@@ -101,9 +110,6 @@ func realPlayerTurn(crazy *game.CrazyEights, playerID int) {
 		}
 		eligibleTurn = crazy.EligibleTurn(playerID)
 	}
-	topCard, _ := crazy.TopOfDiscardPile()
-	fmt.Printf("\nTop of pile %v\n", topCard)
-	showHand(crazy.Players[playerID])
 }
 
 func cpuTurn(crazy *game.CrazyEights, playerID int) {
