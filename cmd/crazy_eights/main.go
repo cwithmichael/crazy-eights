@@ -50,11 +50,12 @@ func main() {
 			validPlay = crazy.ValidPlay(player1, cardIndex)
 		}
 		playedCard, err := crazy.PlayCard(player1, cardIndex)
-		fmt.Println(playedCard)
 		if err != nil {
 			fmt.Errorf("something went terribly wrong: %v", err)
 		}
 		fmt.Printf("You played %v\n", playedCard)
+
+		// Check if card played was an 8
 		if playedCard.Rank() == card.Eight {
 			fmt.Println("1: Spades 2: Hearts 3: Diamonds 4: Clubs")
 			fmt.Print("Enter # of Suit you want to play: ")
@@ -65,6 +66,8 @@ func main() {
 			}
 			crazy.HandleEight(suit)
 		}
+
+		// Check to see if player1's hand is empty
 		if checkIfWinner(crazy.Players[player1]) {
 			break
 		}
@@ -97,6 +100,7 @@ func main() {
 				break
 			}
 		}
+		// Check to see if the cpu's hand is empty
 		if checkIfWinner(crazy.Players[player2]) {
 			break
 		}

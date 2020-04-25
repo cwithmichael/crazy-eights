@@ -19,4 +19,5 @@
 
 ## TODO
 1. Handle the deck being exhausted
-2. Improve test coverage
+2. Improve error handling
+3. Improve test coverage
