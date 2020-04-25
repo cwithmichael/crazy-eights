@@ -52,7 +52,7 @@ func main() {
 			fmt.Print("Enter # of Suit you want to switch to: ")
 			suit, err := getDesiredIndex(r)
 			for {
-				if err != nil || suit < 1 || suit > 4 {
+				if err != nil || suit < 0 || suit > 4 {
 					fmt.Println("Invalid choice - Please try again")
 					fmt.Print("Enter # of Suit you want to switch to: ")
 					suit, err = getDesiredIndex(r)
